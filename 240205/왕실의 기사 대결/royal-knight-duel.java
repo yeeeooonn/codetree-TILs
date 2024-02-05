@@ -70,13 +70,6 @@ public class Main {
             }
         }
         System.out.println(answer);
-
-        for (int i = 0; i < L; i++) {
-            for (int j = 0; j < L; j++) {
-                System.out.print(person[i][j]+" ");
-            }
-            System.out.println();
-        }
     }
     static void push(int first, int knightNum, int d) {
         //명령받은 기사가 체력이 1 이상인지 확인 후 진행
