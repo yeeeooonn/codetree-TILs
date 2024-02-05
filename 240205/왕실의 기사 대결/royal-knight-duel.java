@@ -7,6 +7,7 @@ public class Main {
     static int[][] map;
     static int[][] person;
     static Knight[] knights;
+    static int[] firstScore;
     static boolean[] isMeet;
     static boolean isWall;
     static int answer;
@@ -36,6 +37,7 @@ public class Main {
         map = new int[L][L]; //맵에 관한 정보(빈칸, 함정, 벽)
         person = new int[L][L]; //기사 위치에 관한 정보
         knights = new Knight[N+1];
+        firstScore = new int[N+1];
 
         for (int i = 0; i < L; i++) { //맵 입력
             st = new StringTokenizer(br.readLine());
@@ -47,6 +49,7 @@ public class Main {
         for (int i = 1; i <= N; i++) { //기사 정보 입력
             st = new StringTokenizer(br.readLine());
             knights[i] = new Knight(Integer.parseInt(st.nextToken())-1, Integer.parseInt(st.nextToken())-1, Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+            firstScore[i] = knights[i].k;
             for (int j = knights[i].r; j < knights[i].r + knights[i].h; j++) {
                 for (int k = knights[i].c; k < knights[i].c + knights[i].w; k++) {
                     person[j][k] = i;
@@ -61,7 +64,19 @@ public class Main {
             push(k, k, Integer.parseInt(st.nextToken()));
         }
 
+        for (int i = 1; i <= N; i++) {
+            if(knights[i].k > 0) {
+                answer += (firstScore[i] - knights[i].k);
+            }
+        }
         System.out.println(answer);
+
+        for (int i = 0; i < L; i++) {
+            for (int j = 0; j < L; j++) {
+                System.out.print(person[i][j]+" ");
+            }
+            System.out.println();
+        }
     }
     static void push(int first, int knightNum, int d) {
         //명령받은 기사가 체력이 1 이상인지 확인 후 진행
@@ -71,7 +86,7 @@ public class Main {
         if(d == 0) { //위 -> 가로 길이 확인
             for (int i = 0; i < knights[knightNum].w; i++) {
                 int nr = knights[knightNum].r + dr[d];
-                int nc = knights[knightNum].c + i + dr[d];
+                int nc = knights[knightNum].c + i + dc[d];
                 checkKnight(nr,nc, first, d);
             }
 
@@ -79,7 +94,7 @@ public class Main {
         }else if(d == 2) { //아래 -> 가로 길이 확인
             for (int i = 0; i < knights[knightNum].w; i++) {
                 int nr = knights[knightNum].r + knights[knightNum].h -1 + dr[d];
-                int nc = knights[knightNum].c + i + dr[d];
+                int nc = knights[knightNum].c + i + dc[d];
                 checkKnight(nr,nc, first, d);
             }
 
@@ -100,11 +115,11 @@ public class Main {
 
         }
         //다 확인 했으면 옮기기 - 벽을 안만났을 경우에만
-        if(!isWall && first != knightNum) {
-            move(knightNum, d);
+        if(!isWall) {
+            move(knightNum, d, first == knightNum);
         }
     }
-    static void move(int knightNum, int d) {
+    static void move(int knightNum, int d, boolean isFirst) {
 
         //원래있던곳 0으로
         for (int j = knights[knightNum].r; j < knights[knightNum].r + knights[knightNum].h; j++) {
@@ -119,9 +134,8 @@ public class Main {
         for (int j = knights[knightNum].r; j < knights[knightNum].r + knights[knightNum].h; j++) {
             for (int k = knights[knightNum].c; k < knights[knightNum].c + knights[knightNum].w; k++) {
                 person[j][k] = knightNum;
-                if(map[j][k] == 1) {
+                if(!isFirst && map[j][k] == 1) {
                     knights[knightNum].k -=1;
-                    answer++;
                 }
             }
         }
